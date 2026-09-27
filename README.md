@@ -130,6 +130,44 @@ GitHub Actions handles validation/build orchestration; the planned ChatGPT sched
 
 Never commit credentials or signing material. Keep tests usable without production secrets, and restrict signed build jobs to trusted repository changes. CI/CD remains a plan until workflow files and required credentials are configured; this README does not imply any pipeline has run.
 
+## Two-week implementation roadmap
+
+Day numbers are work sessions starting when implementation begins, not a claim that a calendar schedule is already active. Aim for 2–4 small, meaningful commits per productive day, each covering a coherent change. Native feasibility and physical-device feedback may shift later tasks; record blockers rather than pretending a milestone passed.
+
+| Day | Focus | Suggested commit boundaries | Done when |
+| --- | --- | --- | --- |
+| 1 | App foundation | Scaffold React Native/TypeScript; add routes; configure initial CI | App shell launches and initial checks pass |
+| 2 | Native alarm feasibility | Add native alarm adapter; prototype schedule/open/stop; document device findings | Locked-phone behavior and dismissal constraints are recorded, or a specific device blocker is recorded |
+| 3 | Camera and pose feasibility | Add camera permission/view; spike on-device landmarks; document adapter choice | Landmarks run on target iPhone with a recorded performance sample |
+| 4 | Alarm data | Define alarm model; implement storage; test reload/migration behavior | Alarm records survive restart |
+| 5 | Alarm UI | Build list/editor; add validation; cover CRUD interactions | Users can create, edit, disable, and delete stored alarms |
+| 6 | Native scheduling | Connect editor to native adapter; reconcile state; test failures | UI reflects actual scheduling success and cancellation |
+| 7 | Repetition logic | Implement closed/open/closed counter; add noisy/partial fixtures; verify completion | Deterministic tests cover correct counts and false-positive cases |
+| 8 | Challenge UI | Add framing guidance; connect live landmarks; display progress | Five real reps complete an in-app challenge on device |
+| 9 | Alarm-to-challenge flow | Handle opening an occurrence; prevent duplicate sessions; separate system stop from completion | End-to-end flow matches documented platform behavior |
+| 10 | Recovery and access | Add camera-denied/failure fallback; handle interruptions; improve accessible labels | Users can recover from unavailable camera or movement |
+| 11 | Scheduling edge cases | Implement timezone/DST policy; test repeating alarms; exercise lifecycle reconciliation | Edge behavior is documented and tested |
+| 12 | Delivery pipeline | Configure EAS profiles; add trusted build trigger; document install steps | CI produces an installable test artifact once signing is available |
+| 13 | Device hardening | Run device matrix; fix observed alarm/pose bugs; tune measured thresholds | Device report includes evidence and remaining limitations |
+| 14 | Demo and handoff | Polish onboarding; update setup docs; record demo/release checklist | MVP can be demonstrated with accurate limitations and reproducible setup |
+
+### Daily ChatGPT/Codex workflow (planned)
+
+1. Read the latest README, repository instructions, open pull requests, and task status. Pull the latest base before making changes.
+2. Pick the next unblocked roadmap item. Continue an existing task branch when appropriate instead of duplicating work.
+3. Break the item into small coherent changes, such as a component, its behavior tests, and related documentation. Commit useful small changes separately; do not create empty commits or split lines just to inflate activity.
+4. Run checks appropriate to each change. Report any test that could not run, especially native/device checks.
+5. Push the task branch and open or update a pull request. Preserve individual commits when merging if the goal is to retain the development history.
+6. Summarize commit links, changes, checks, blockers, and the next task. Mark a roadmap item complete only when its acceptance evidence exists.
+
+Multiple commits can happen during a single morning run; multiple scheduled runs are optional. A web run must retrieve current source from GitHub and push durable changes back, rather than relying on yesterday's local files. Avoid overlapping edits, force pushes, automatic production releases, and treating green CI as a substitute for phone testing.
+
+**Automation status:** not scheduled. First verify an authenticated push, then configure the run time/timezone and task instructions. This initial documentation pass is a manual connection test and does not start the two-week implementation clock.
+
+## Getting started
+
+There is no runnable app yet. The next implementation task is Day 1: scaffold the app and commit the exact install, run, and test commands once they exist. Do not assume `npm start`, a test suite, or an EAS build profile is available in this documentation-only repository.
+
 ## Technical references
 
 - [Apple: scheduling an alarm with AlarmKit](https://developer.apple.com/documentation/alarmkit/scheduling-an-alarm-with-alarmkit)
