@@ -89,6 +89,47 @@ Keep system alarm status separate from challenge outcomes: `completed`, `abandon
 
 These paths are planned; they do not exist yet.
 
+## Testing plan
+
+| Level | Cases | Completion evidence |
+| --- | --- | --- |
+| Movement unit tests | Five full cycles; partial cycles; jitter; low confidence; person leaving frame; duplicate/out-of-order frames; repeated completion | Deterministic landmark fixtures produce the expected rep count and exactly one completion event |
+| Alarm unit tests | Invalid times; repeat days; permission denial; scheduling failure; edits; cancellation; timezone/DST policy | Rules and adapter error handling pass without requiring an iPhone |
+| Component tests | Alarm CRUD; empty state; permission guidance; 0/5 through 5/5 progress; fallback | Visible UI and user actions match session state |
+| Integration tests | Native adapter contract; persistence reload; duplicate callbacks; native/local reconciliation | No duplicate sessions or falsely enabled alarms |
+| Simulator smoke tests | Navigation, editing, storage reload, challenge with injected pose data | Repeatable core flow; simulated poses are clearly labeled |
+| Physical iPhone checks | Lock screen; background/terminated app; Focus/silent mode; reboot; interrupted camera; system stop; real movement | Device model, OS, build, expected result, actual result, and pass/fail recorded |
+
+For pose validation, test different distances, lighting, clothing, and movement speeds. Test standing still and partial motions for false positives. Measure processing latency and dropped frames on the target phone before setting a performance budget. Device checks are a release gate; passing mocked tests is not evidence that the alarm works while the phone is locked.
+
+### MVP acceptance checklist
+
+- [ ] A scheduled alarm is verified on a locked physical iPhone.
+- [ ] System dismissal and movement-challenge completion are represented accurately.
+- [ ] Five complete jumping jacks finish the session exactly once.
+- [ ] Partial movements and standing still do not complete the challenge in recorded device trials.
+- [ ] Permission denial, camera failure, and loss of tracking have usable recovery paths.
+- [ ] Alarm edits, deletions, and restarts do not produce duplicate or stale schedules.
+- [ ] App works offline and does not upload camera frames.
+- [ ] CI checks pass and an installable iOS build passes device smoke testing.
+
+## CI/CD plan
+
+**CI — on pull requests and pushes:** install from the lockfile, check formatting, lint, type-check, and run unit/component tests. Add native compile checks after introducing native modules. Documentation-only changes can use lightweight Markdown/link checks instead of building the app. Require relevant checks before merging application changes.
+
+**CD — after a tested merge:** use a configured Expo EAS build profile to produce an iOS development or internal test build. Build native changes into a new binary; JavaScript updates must match the installed native runtime. TestFlight distribution is a later milestone once Apple signing and App Store Connect are configured. App Store release is a separate, explicit decision.
+
+GitHub Actions handles validation/build orchestration; the planned ChatGPT scheduled task handles coding. There is no scheduled Codex GitHub Action or OpenAI API key requirement in this design.
+
+### Setup dependencies
+
+- GitHub repository access and permission to push branches/open pull requests.
+- Expo project/account and CI credentials configured as secrets when cloud builds are enabled.
+- Suitable Apple signing credentials and registered device access for the chosen distribution route; TestFlight requires the appropriate Apple Developer/App Store Connect setup.
+- A physical iPhone for alarm and camera testing; a Mac/Xcode environment for local native debugging if needed.
+
+Never commit credentials or signing material. Keep tests usable without production secrets, and restrict signed build jobs to trusted repository changes. CI/CD remains a plan until workflow files and required credentials are configured; this README does not imply any pipeline has run.
+
 ## Technical references
 
 - [Apple: scheduling an alarm with AlarmKit](https://developer.apple.com/documentation/alarmkit/scheduling-an-alarm-with-alarmkit)
