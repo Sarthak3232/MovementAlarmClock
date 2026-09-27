@@ -2,7 +2,7 @@
 
 An iPhone alarm app with a movement challenge: get out of bed, stand in view of the camera, and complete **five jumping jacks** to finish your wake-up session.
 
-**Status:** planning and architecture only. The app, native integrations, tests, CI/CD workflows, and scheduled coding task are not implemented yet. Everything below describes the intended design.
+**Status:** Day 1 foundation code is in place: Expo/TypeScript routes, preview screens, and initial automated checks. Native alarms, camera/pose integration, and persistence are not implemented. The app does not ring alarms yet. See [implementation progress and validation evidence](docs/progress.md). Architecture and later roadmap items below remain the intended design.
 
 ## MVP
 
@@ -23,18 +23,18 @@ Before building the full experience, test a native alarm prototype on a physical
 
 ## Proposed stack
 
-| Layer | Initial choice | Purpose / decision gate |
-| --- | --- | --- |
-| App | React Native, TypeScript, Expo development build | Screens and shared application logic; custom native modules require a development build |
-| Navigation | Expo Router | Alarm list, editor, challenge, and settings |
-| Alarm integration | Swift module wrapping AlarmKit | Native scheduling and lifecycle events; confirm availability and supported iOS target in the prototype |
-| Camera / pose | Native camera and on-device pose adapter | Evaluate an iOS-compatible detector in the prototype before selecting a package |
-| Movement logic | Pure TypeScript state machine | Count complete repetitions independently of camera libraries |
-| Persistence | Local storage behind a typed repository | Store schedules and settings; reconcile saved records with native alarm state |
-| Validation | Jest and React Native Testing Library, plus native/device checks | Exercise rules, UI behavior, and platform integration |
-| Delivery | GitHub Actions and Expo EAS | Automated checks and signed iOS test builds |
+| Layer             | Initial choice                                                   | Purpose / decision gate                                                                                |
+| ----------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| App               | React Native, TypeScript, Expo development build                 | Screens and shared application logic; custom native modules require a development build                |
+| Navigation        | Expo Router                                                      | Alarm list, editor, challenge, and settings                                                            |
+| Alarm integration | Swift module wrapping AlarmKit                                   | Native scheduling and lifecycle events; confirm availability and supported iOS target in the prototype |
+| Camera / pose     | Native camera and on-device pose adapter                         | Evaluate an iOS-compatible detector in the prototype before selecting a package                        |
+| Movement logic    | Pure TypeScript state machine                                    | Count complete repetitions independently of camera libraries                                           |
+| Persistence       | Local storage behind a typed repository                          | Store schedules and settings; reconcile saved records with native alarm state                          |
+| Validation        | Jest and React Native Testing Library, plus native/device checks | Exercise rules, UI behavior, and platform integration                                                  |
+| Delivery          | GitHub Actions and Expo EAS                                      | Automated checks and signed iOS test builds                                                            |
 
-Package versions and native compatibility will be pinned when the app is scaffolded. Expo Go is not the target runtime for the native alarm prototype. No GPT API is needed inside the app; ChatGPT/Codex assists development.
+Package versions are pinned in `package.json` and `package-lock.json`; native build and device compatibility still require validation. Expo Go is not the target runtime for the native alarm prototype. No GPT API is needed inside the app; ChatGPT/Codex assists development.
 
 ## System architecture
 
@@ -66,39 +66,39 @@ Use confidence thresholds, separate entry/exit thresholds, and a minimum stable 
 
 ### Proposed records
 
-| Record | Fields |
-| --- | --- |
-| Alarm | ID, local time, repeat weekdays, enabled flag, native ID, scheduling status |
-| Wake-up session | ID, alarm occurrence ID, start time, rep count, outcome, end time |
-| Settings | Movement target (MVP: 5), onboarding state, permission guidance |
+| Record          | Fields                                                                      |
+| --------------- | --------------------------------------------------------------------------- |
+| Alarm           | ID, local time, repeat weekdays, enabled flag, native ID, scheduling status |
+| Wake-up session | ID, alarm occurrence ID, start time, rep count, outcome, end time           |
+| Settings        | Movement target (MVP: 5), onboarding state, permission guidance             |
 
 Keep system alarm status separate from challenge outcomes: `completed`, `abandoned`, or `fallback`. Store no raw camera frames. Define timezone travel, daylight-saving changes, and repeat scheduling behavior before enabling recurring alarms.
 
 ## Proposed source layout
 
-| Path | Responsibility |
-| --- | --- |
-| `app/` | Routes and screens |
-| `src/features/alarms/` | Alarm editing, validation, and reconciliation |
-| `src/features/challenge/` | Session controller and challenge UI |
-| `src/domain/movement/` | Pure repetition logic and landmark fixtures |
-| `src/storage/` | Local persistence and schema migrations |
-| `modules/` | Native alarm and pose integrations |
-| `docs/` | Device findings and implementation decisions |
-| `.github/workflows/` | CI and build orchestration |
+| Path                      | Responsibility                                |
+| ------------------------- | --------------------------------------------- |
+| `app/`                    | Routes and screens                            |
+| `src/features/alarms/`    | Alarm editing, validation, and reconciliation |
+| `src/features/challenge/` | Session controller and challenge UI           |
+| `src/domain/movement/`    | Pure repetition logic and landmark fixtures   |
+| `src/storage/`            | Local persistence and schema migrations       |
+| `modules/`                | Native alarm and pose integrations            |
+| `docs/`                   | Device findings and implementation decisions  |
+| `.github/workflows/`      | CI and build orchestration                    |
 
-These paths are planned; they do not exist yet.
+`app/`, `src/components/`, `tests/`, `docs/`, and `.github/workflows/` now exist. Feature, domain, storage, and native module paths remain planned.
 
 ## Testing plan
 
-| Level | Cases | Completion evidence |
-| --- | --- | --- |
-| Movement unit tests | Five full cycles; partial cycles; jitter; low confidence; person leaving frame; duplicate/out-of-order frames; repeated completion | Deterministic landmark fixtures produce the expected rep count and exactly one completion event |
-| Alarm unit tests | Invalid times; repeat days; permission denial; scheduling failure; edits; cancellation; timezone/DST policy | Rules and adapter error handling pass without requiring an iPhone |
-| Component tests | Alarm CRUD; empty state; permission guidance; 0/5 through 5/5 progress; fallback | Visible UI and user actions match session state |
-| Integration tests | Native adapter contract; persistence reload; duplicate callbacks; native/local reconciliation | No duplicate sessions or falsely enabled alarms |
-| Simulator smoke tests | Navigation, editing, storage reload, challenge with injected pose data | Repeatable core flow; simulated poses are clearly labeled |
-| Physical iPhone checks | Lock screen; background/terminated app; Focus/silent mode; reboot; interrupted camera; system stop; real movement | Device model, OS, build, expected result, actual result, and pass/fail recorded |
+| Level                  | Cases                                                                                                                              | Completion evidence                                                                             |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Movement unit tests    | Five full cycles; partial cycles; jitter; low confidence; person leaving frame; duplicate/out-of-order frames; repeated completion | Deterministic landmark fixtures produce the expected rep count and exactly one completion event |
+| Alarm unit tests       | Invalid times; repeat days; permission denial; scheduling failure; edits; cancellation; timezone/DST policy                        | Rules and adapter error handling pass without requiring an iPhone                               |
+| Component tests        | Alarm CRUD; empty state; permission guidance; 0/5 through 5/5 progress; fallback                                                   | Visible UI and user actions match session state                                                 |
+| Integration tests      | Native adapter contract; persistence reload; duplicate callbacks; native/local reconciliation                                      | No duplicate sessions or falsely enabled alarms                                                 |
+| Simulator smoke tests  | Navigation, editing, storage reload, challenge with injected pose data                                                             | Repeatable core flow; simulated poses are clearly labeled                                       |
+| Physical iPhone checks | Lock screen; background/terminated app; Focus/silent mode; reboot; interrupted camera; system stop; real movement                  | Device model, OS, build, expected result, actual result, and pass/fail recorded                 |
 
 For pose validation, test different distances, lighting, clothing, and movement speeds. Test standing still and partial motions for false positives. Measure processing latency and dropped frames on the target phone before setting a performance budget. Device checks are a release gate; passing mocked tests is not evidence that the alarm works while the phone is locked.
 
@@ -128,30 +128,30 @@ GitHub Actions handles validation/build orchestration; the planned ChatGPT sched
 - Suitable Apple signing credentials and registered device access for the chosen distribution route; TestFlight requires the appropriate Apple Developer/App Store Connect setup.
 - A physical iPhone for alarm and camera testing; a Mac/Xcode environment for local native debugging if needed.
 
-Never commit credentials or signing material. Keep tests usable without production secrets, and restrict signed build jobs to trusted repository changes. CI/CD remains a plan until workflow files and required credentials are configured; this README does not imply any pipeline has run.
+Never commit credentials or signing material. Keep tests usable without production secrets, and restrict signed build jobs to trusted repository changes. The app-checks workflow is configured; its run status is visible on each PR. Signed builds and distribution remain planned until build profiles and credentials are configured. See the progress log for observed validation results.
 
 ## Two-week implementation roadmap
 
 Day numbers are work sessions starting when implementation begins, not a claim that a calendar schedule is already active. Aim for 2–4 small, meaningful commits per productive day, each covering a coherent change. Native feasibility and physical-device feedback may shift later tasks; record blockers rather than pretending a milestone passed.
 
-| Day | Focus | Suggested commit boundaries | Done when |
-| --- | --- | --- | --- |
-| 1 | App foundation | Scaffold React Native/TypeScript; add routes; configure initial CI | App shell launches and initial checks pass |
-| 2 | Native alarm feasibility | Add native alarm adapter; prototype schedule/open/stop; document device findings | Locked-phone behavior and dismissal constraints are recorded, or a specific device blocker is recorded |
-| 3 | Camera and pose feasibility | Add camera permission/view; spike on-device landmarks; document adapter choice | Landmarks run on target iPhone with a recorded performance sample |
-| 4 | Alarm data | Define alarm model; implement storage; test reload/migration behavior | Alarm records survive restart |
-| 5 | Alarm UI | Build list/editor; add validation; cover CRUD interactions | Users can create, edit, disable, and delete stored alarms |
-| 6 | Native scheduling | Connect editor to native adapter; reconcile state; test failures | UI reflects actual scheduling success and cancellation |
-| 7 | Repetition logic | Implement closed/open/closed counter; add noisy/partial fixtures; verify completion | Deterministic tests cover correct counts and false-positive cases |
-| 8 | Challenge UI | Add framing guidance; connect live landmarks; display progress | Five real reps complete an in-app challenge on device |
-| 9 | Alarm-to-challenge flow | Handle opening an occurrence; prevent duplicate sessions; separate system stop from completion | End-to-end flow matches documented platform behavior |
-| 10 | Recovery and access | Add camera-denied/failure fallback; handle interruptions; improve accessible labels | Users can recover from unavailable camera or movement |
-| 11 | Scheduling edge cases | Implement timezone/DST policy; test repeating alarms; exercise lifecycle reconciliation | Edge behavior is documented and tested |
-| 12 | Delivery pipeline | Configure EAS profiles; add trusted build trigger; document install steps | CI produces an installable test artifact once signing is available |
-| 13 | Device hardening | Run device matrix; fix observed alarm/pose bugs; tune measured thresholds | Device report includes evidence and remaining limitations |
-| 14 | Demo and handoff | Polish onboarding; update setup docs; record demo/release checklist | MVP can be demonstrated with accurate limitations and reproducible setup |
+| Day | Focus                       | Suggested commit boundaries                                                                    | Done when                                                                                              |
+| --- | --------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 1   | App foundation              | Scaffold React Native/TypeScript; add routes; configure initial CI                             | App shell launches and initial checks pass                                                             |
+| 2   | Native alarm feasibility    | Add native alarm adapter; prototype schedule/open/stop; document device findings               | Locked-phone behavior and dismissal constraints are recorded, or a specific device blocker is recorded |
+| 3   | Camera and pose feasibility | Add camera permission/view; spike on-device landmarks; document adapter choice                 | Landmarks run on target iPhone with a recorded performance sample                                      |
+| 4   | Alarm data                  | Define alarm model; implement storage; test reload/migration behavior                          | Alarm records survive restart                                                                          |
+| 5   | Alarm UI                    | Build list/editor; add validation; cover CRUD interactions                                     | Users can create, edit, disable, and delete stored alarms                                              |
+| 6   | Native scheduling           | Connect editor to native adapter; reconcile state; test failures                               | UI reflects actual scheduling success and cancellation                                                 |
+| 7   | Repetition logic            | Implement closed/open/closed counter; add noisy/partial fixtures; verify completion            | Deterministic tests cover correct counts and false-positive cases                                      |
+| 8   | Challenge UI                | Add framing guidance; connect live landmarks; display progress                                 | Five real reps complete an in-app challenge on device                                                  |
+| 9   | Alarm-to-challenge flow     | Handle opening an occurrence; prevent duplicate sessions; separate system stop from completion | End-to-end flow matches documented platform behavior                                                   |
+| 10  | Recovery and access         | Add camera-denied/failure fallback; handle interruptions; improve accessible labels            | Users can recover from unavailable camera or movement                                                  |
+| 11  | Scheduling edge cases       | Implement timezone/DST policy; test repeating alarms; exercise lifecycle reconciliation        | Edge behavior is documented and tested                                                                 |
+| 12  | Delivery pipeline           | Configure EAS profiles; add trusted build trigger; document install steps                      | CI produces an installable test artifact once signing is available                                     |
+| 13  | Device hardening            | Run device matrix; fix observed alarm/pose bugs; tune measured thresholds                      | Device report includes evidence and remaining limitations                                              |
+| 14  | Demo and handoff            | Polish onboarding; update setup docs; record demo/release checklist                            | MVP can be demonstrated with accurate limitations and reproducible setup                               |
 
-### Daily ChatGPT/Codex workflow (planned)
+### Daily ChatGPT/Codex workflow
 
 1. Read the latest README, repository instructions, open pull requests, and task status. Pull the latest base before making changes.
 2. Pick the next unblocked roadmap item. Continue an existing task branch when appropriate instead of duplicating work.
@@ -162,11 +162,23 @@ Day numbers are work sessions starting when implementation begins, not a claim t
 
 Multiple commits can happen during a single morning run; multiple scheduled runs are optional. A web run must retrieve current source from GitHub and push durable changes back, rather than relying on yesterday's local files. Avoid overlapping edits, force pushes, automatic production releases, and treating green CI as a substitute for phone testing.
 
-**Automation status:** not scheduled. First verify an authenticated push, then configure the run time/timezone and task instructions. This initial documentation pass is a manual connection test and does not start the two-week implementation clock.
+**Automation workflow:** continue from actual repository progress. Task branches are reviewed and can be merged with a merge commit only after relevant checks pass; pending checks, required human reviews, conflicts, and relevant device gates block merging. Never fabricate an independent approval or bypass branch protections.
 
 ## Getting started
 
-There is no runnable app yet. The next implementation task is Day 1: scaffold the app and commit the exact install, run, and test commands once they exist. Do not assume `npm start`, a test suite, or an EAS build profile is available in this documentation-only repository.
+Use Node 24 (`nvm use`) and npm. From the repository root:
+
+```sh
+npm ci
+npm run check
+npm run export:ios
+```
+
+`check` runs Prettier, ESLint, TypeScript, and Jest component/navigation tests. `export:ios` bundles JavaScript for iOS; it does **not** compile Swift, sign a binary, launch a simulator, or test a physical phone.
+
+On a Mac with Xcode, run `npm run ios` to generate/build the native development client and launch the simulator. For subsequent JavaScript development, use `npm start` with that installed client. Expo Go is not the target runtime. No EAS project, build profile, or Apple signing credentials have been configured.
+
+The shell offers an alarm-list empty state, disabled alarm setup, a 0/5 challenge preview, and privacy/settings guidance. Follow the [app-shell smoke procedure](docs/progress.md#app-shell-smoke-procedure-not-yet-executed) to record native launch evidence. Continue using a separate reliable alarm.
 
 ## Technical references
 
