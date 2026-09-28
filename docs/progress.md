@@ -1,5 +1,34 @@
 # Implementation progress
 
+## 2026-09-28 — Deterministic jumping-jack logic
+
+### Scope
+
+- Merged [PR #1](https://github.com/Sarthak3232/MovementAlarmClock/pull/1) after the exact head's `app-checks` job succeeded. The merge commit preserves both foundation commits.
+- Added a pure TypeScript pose classifier using body-relative arm and foot measurements rather than raw pixel distances.
+- Added a stable closed → open → closed state machine with a five-rep target, confidence filtering, entry/exit hysteresis, and one completion event.
+- Added deterministic fixtures for full reps, partial movement, repeated poses, threshold jitter, malformed/low-confidence landmarks, missing tracking, stale gaps, and duplicate/out-of-order frames.
+
+### Evidence
+
+Local validation on Linux with Node 24.19.0:
+
+- Prettier, ESLint, and strict TypeScript: passed.
+- Jest: 14/14 tests passed, including 10 movement-domain tests and 4 navigation/component tests.
+- iOS JavaScript export: passed (1,108 modules). This is not a native build or device test.
+
+The deterministic portion of roadmap Day 7 is complete: the synthetic fixtures cover correct counts and the planned false-positive cases, and completion is emitted once. Real pose landmarks, thresholds, latency, and false positives still need camera integration and physical-iPhone trials before the movement feature can be considered validated.
+
+### Native feasibility gate
+
+Roadmap Day 2 remains blocked in this Linux environment: it has no Xcode 26 toolchain, iOS 26 simulator, physical iPhone, or Apple signing setup, so an AlarmKit module cannot be compiled or its lock-screen lifecycle observed here. Apple's AlarmKit documentation identifies iOS/iPadOS 26 as the platform target, requires per-app authorization and an `NSAlarmKitUsageDescription`, and exposes system alarm lifecycle operations. The device trial must still record scheduling, app launch/custom action behavior, system stop/snooze behavior, background/terminated delivery, and reconciliation after dismissal. Movement completion must remain a separate app event from system alarm dismissal.
+
+### Next run
+
+1. Resolve the movement-counter PR's CI and review state before overlapping work.
+2. If macOS/Xcode and a physical iPhone are still unavailable, proceed to the independent alarm data model and typed persistence repository from roadmap Day 4.
+3. Do not connect synthetic landmarks to the production challenge UI or claim camera support. Camera adapter selection and threshold calibration remain roadmap Days 3 and 8 device work.
+
 ## 2026-09-27 — Day 1 foundation
 
 ### Scope
@@ -30,12 +59,9 @@ This execution environment is Linux, with no Xcode, iOS simulator, attached iPho
 
 The README's physical-device gates remain open. This scaffold does not implement or make claims about AlarmKit delivery, app termination, system stop behavior, or live camera processing. No release is authorized by these checks.
 
-### Next run
+### Follow-up
 
-1. Read this log, the README, and open PRs. Resolve pending CI/review on the existing foundation PR before overlapping changes.
-2. Verify the app shell launches using the smoke procedure below when a Mac/iOS runtime is available.
-3. Begin Day 2: investigate the native AlarmKit adapter and its supported iOS target. Record a precise build/device blocker if unavailable. Keep system stop separate from movement completion.
-4. Independent pure TypeScript movement logic is available if native work is blocked; do not claim native feasibility from mocked tests.
+The foundation PR merged with successful CI. Native launch verification remains open; use the smoke procedure below when a Mac/iOS runtime is available.
 
 ## App-shell smoke procedure (not yet executed)
 
