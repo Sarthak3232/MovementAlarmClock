@@ -2,7 +2,7 @@
 
 An iPhone alarm app with a movement challenge: get out of bed, stand in view of the camera, and complete **five jumping jacks** to finish your wake-up session.
 
-**Status:** Day 1 foundation code is in place: Expo/TypeScript routes, preview screens, and initial automated checks. Native alarms, camera/pose integration, and persistence are not implemented. The app does not ring alarms yet. See [implementation progress and validation evidence](docs/progress.md). Architecture and later roadmap items below remain the intended design.
+**Status:** The Expo/TypeScript foundation and a pure TypeScript jumping-jack counter are in place. The counter is covered by deterministic synthetic-pose tests, but it is not connected to a camera and its thresholds are not calibrated on a person or device. Native alarms, camera/pose integration, and persistence are not implemented. The app does not ring alarms yet. See [implementation progress and validation evidence](docs/progress.md).
 
 ## MVP
 
@@ -87,7 +87,7 @@ Keep system alarm status separate from challenge outcomes: `completed`, `abandon
 | `docs/`                   | Device findings and implementation decisions  |
 | `.github/workflows/`      | CI and build orchestration                    |
 
-`app/`, `src/components/`, `tests/`, `docs/`, and `.github/workflows/` now exist. Feature, domain, storage, and native module paths remain planned.
+`app/`, `src/components/`, `src/domain/movement/`, `tests/`, `docs/`, and `.github/workflows/` now exist. Feature, storage, and native module paths remain planned.
 
 ## Testing plan
 
