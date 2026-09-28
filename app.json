@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Movement Alarm Clock",
+    "slug": "movement-alarm-clock",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "platforms": ["ios"],
+    "scheme": "movementalarmclock",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sarthakkapoor.movementalarmclock"
+    },
+    "plugins": ["expo-router", "expo-dev-client", "expo-status-bar"]
+  }
+}
