@@ -17,7 +17,7 @@ Local validation on Linux with Node 24.19.0:
 - Clean `npm ci`: passed after one transient proxy/cache retry.
 - Prettier, ESLint, and strict TypeScript: passed.
 - Jest: 30/30 tests passed across 5 suites, including 16 new alarm model, repository, and file-adapter tests.
-- Expo dependency compatibility: the online lookup timed out through the environment proxy; `EXPO_OFFLINE=1 npx expo install --check` passed against bundled SDK compatibility data and reported that offline validation is limited. CI must run the regular online check.
+- Expo dependency compatibility: the initial PR check reported newer SDK 57 patch expectations for Expo, Constants, and Router, so those pins were aligned to the exact versions reported by CI. Local online lookups timed out through the environment proxy; `EXPO_OFFLINE=1 npx expo install --check` passed against bundled SDK compatibility data and reported that offline validation is limited. Follow-up CI runs the authoritative online check.
 - iOS JavaScript export: passed (1,108 modules). This is not a native build or device test.
 
 The Day 4 implementation is present and repository/store recreation tests demonstrate reload behavior. The roadmap milestone remains **in progress** until an iOS simulator or physical-iPhone run confirms that a saved alarm survives an actual app restart. There was no prior persisted schema to migrate; version 1 is the baseline, and unknown versions are rejected rather than guessed.
