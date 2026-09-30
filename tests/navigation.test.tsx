@@ -3,6 +3,7 @@ import { renderRouter, screen } from 'expo-router/testing-library';
 import RootLayout from '../app/_layout';
 import AlarmsScreen from '../app/index';
 import NewAlarmScreen from '../app/alarms/new';
+import EditAlarmScreen from '../app/alarms/[id]';
 import ChallengeScreen from '../app/challenge';
 import SettingsScreen from '../app/settings';
 
@@ -10,21 +11,21 @@ const routes = {
   _layout: RootLayout,
   index: AlarmsScreen,
   'alarms/new': NewAlarmScreen,
+  'alarms/[id]': EditAlarmScreen,
   challenge: ChallengeScreen,
   settings: SettingsScreen,
 };
 
-describe('app foundation', () => {
-  it('opens alarm setup without offering a working schedule action', async () => {
+describe('app navigation', () => {
+  it('opens alarm setup without claiming that saving schedules an alarm', async () => {
     const result = renderRouter(routes, { initialUrl: '/' });
-    expect(screen.getByText('No alarms yet')).toBeVisible();
-    fireEvent.press(screen.getByText('Explore alarm setup'));
+    expect(await screen.findByText('No alarms yet')).toBeVisible();
+    fireEvent.press(screen.getByText('Add a saved alarm'));
     expect(
-      await screen.findByText('No alarm has been created or scheduled.'),
+      await screen.findByText(/does not schedule or ring an iPhone alarm/),
     ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Save alarm — unavailable' }),
-    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Save alarm' })).toBeEnabled();
+    expect(screen.getByText(/Saved alarms remain off/)).toBeVisible();
     expect(result.getPathname()).toBe('/alarms/new');
   });
 
