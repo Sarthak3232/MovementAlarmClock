@@ -1,5 +1,33 @@
 # Implementation progress
 
+## 2026-09-30 — Saved alarm CRUD UI
+
+### Scope
+
+- Added reusable alarm-form rules for names, 24-hour local time input, repeat weekdays, creation, and edits.
+- Connected the Expo Router layout to one file-backed alarm repository and added create/edit routes.
+- Replaced the placeholder alarm list with persisted empty, loading, error, and saved-alarm states.
+- Added create, reload, edit, delete, and invalid-time component coverage through the real repository and a mocked on-device file boundary.
+- Kept every saved record disabled and unscheduled. The UI says “Saved only — not scheduled” and does not offer an enable control before native scheduling exists.
+
+### Evidence
+
+Local validation on Linux with Node 24.19.0:
+
+- Prettier, ESLint, and strict TypeScript: passed.
+- Jest: 39/39 tests passed across 7 suites, including 9 new alarm-form and CRUD interaction tests.
+- `EXPO_OFFLINE=1 npx expo install --check`: passed against bundled compatibility data; offline validation is limited, so PR CI must run the regular online check.
+- iOS JavaScript export: passed (1,135 modules). This is not a native build, launch, or device test.
+
+The independent CRUD portion of roadmap Day 5 is implemented. The milestone remains **in progress** because enabling/disabling must reflect real native scheduling and cancellation rather than toggling a local flag. That work remains coupled to roadmap Days 2 and 6.
+
+### Boundaries and next run
+
+- Saving a wake-up plan does not schedule an iPhone alarm. No lock-screen delivery, notification, sound, or background behavior is claimed.
+- The file-backed flow has not been launched or reloaded on an iOS simulator or physical iPhone; Day 4's device-restart evidence remains open.
+- No Xcode build, simulator launch, signing check, physical-iPhone test, AlarmKit trial, camera trial, or movement calibration ran in this environment.
+- If native access is still unavailable, the next independent roadmap work is to define and test timezone/daylight-saving behavior for local schedules before recurring alarms can be enabled.
+
 ## 2026-09-29 — Alarm model and local persistence
 
 ### Scope
@@ -24,7 +52,7 @@ The Day 4 implementation is present and repository/store recreation tests demons
 
 ### Boundaries and next run
 
-- The repository is not yet connected to the alarm-list/editor placeholders. No record is scheduled with iOS, and a persisted record is not evidence that an alarm will ring.
+- The repository was not yet connected to the alarm-list/editor placeholders at this checkpoint. No record was scheduled with iOS, and a persisted record was not evidence that an alarm would ring.
 - No Xcode build, simulator launch, signing check, physical-iPhone persistence reload, AlarmKit trial, camera trial, or movement calibration ran in this environment.
 - Next unblocked work is roadmap Day 5: connect alarm list/editor CRUD to the repository with visible validation and component tests, while keeping scheduling disabled until the native adapter succeeds.
 - Roadmap Days 2 and 3 still require macOS/Xcode and a physical iPhone. Movement completion must remain separate from system alarm dismissal, and camera processing must remain on-device.
@@ -106,9 +134,10 @@ This generates native folders locally and builds a development client for an iOS
 
 Check the following and record the device/simulator model, OS, command, commit SHA, and result here:
 
-- Launch shows "No alarms yet" and explains that alarms do not ring.
-- Explore alarm setup opens the editor; Save is disabled; no alarm is scheduled.
-- Back navigation returns to the alarm list.
+- Launch shows "No alarms yet" and explains that saved plans do not ring.
+- Add a saved alarm, verify it returns to the list as "Saved only — not scheduled," then edit its name/time and delete it.
+- Terminate and relaunch the app after saving a plan; verify the record reloads without being presented as scheduled.
+- Back navigation returns to the alarm list without creating an extra record.
 - Challenge preview shows 0/5 and says detection is not connected.
 - Settings explains on-device processing and system stop limitations.
 - Large text and VoiceOver can access the route links and screen content.
