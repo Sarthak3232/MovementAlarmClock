@@ -2,7 +2,7 @@
 
 An iPhone alarm app with a movement challenge: get out of bed, stand in view of the camera, and complete **five jumping jacks** to finish your wake-up session.
 
-**Status:** The Expo/TypeScript foundation, a pure TypeScript jumping-jack counter, and a validated alarm model with versioned local-file persistence are in place. Persistence is not connected to the placeholder UI and has not been reloaded on an iPhone. The counter is covered by deterministic synthetic-pose tests, but it is not connected to a camera and its thresholds are not calibrated on a person or device. Native alarms and camera/pose integration are not implemented. The app does not ring alarms yet. See [implementation progress and validation evidence](docs/progress.md).
+**Status:** The Expo/TypeScript foundation, a pure TypeScript jumping-jack counter, and a validated alarm model with versioned local-file persistence are in place. The alarm list/editor can create, reload, edit, and delete saved wake-up plans, but every record remains explicitly off and unscheduled. Persistence has not been reloaded on an iPhone. The counter is covered by deterministic synthetic-pose tests, but it is not connected to a camera and its thresholds are not calibrated on a person or device. Native alarms and camera/pose integration are not implemented. The app does not ring alarms yet. See [implementation progress and validation evidence](docs/progress.md).
 
 ## MVP
 
@@ -178,7 +178,7 @@ npm run export:ios
 
 On a Mac with Xcode, run `npm run ios` to generate/build the native development client and launch the simulator. For subsequent JavaScript development, use `npm start` with that installed client. Expo Go is not the target runtime. No EAS project, build profile, or Apple signing credentials have been configured.
 
-The shell offers an alarm-list empty state, disabled alarm setup, a 0/5 challenge preview, and privacy/settings guidance. Follow the [app-shell smoke procedure](docs/progress.md#app-shell-smoke-procedure-not-yet-executed) to record native launch evidence. Continue using a separate reliable alarm.
+The app can save, edit, and delete unscheduled wake-up plans locally; it also offers a 0/5 challenge preview and privacy/settings guidance. Follow the [app-shell smoke procedure](docs/progress.md#app-shell-smoke-procedure-not-yet-executed) to record native launch and persistence evidence. Continue using a separate reliable alarm.
 
 ## Technical references
 
