@@ -1,4 +1,5 @@
 import {
+  nextRecurringOccurrence,
   recurringSchedulePolicy,
   resolveLocalDateTime,
 } from '../src/features/alarms';
@@ -73,5 +74,82 @@ describe('local scheduling policy', () => {
       nonexistentLocalTime: 'first-valid-time-after-gap',
       repeatedLocalTime: 'first-occurrence-only',
     });
+  });
+});
+
+describe('next recurring occurrence', () => {
+  it('keeps the selected wall-clock time after a daylight-saving change', () => {
+    expect(
+      nextRecurringOccurrence(
+        { hour: 7, minute: 30 },
+        [1, 2, 3, 4, 5],
+        new Date('2026-03-06T16:00:00.000Z'),
+        'America/Los_Angeles',
+      ),
+    ).toEqual({
+      instant: new Date('2026-03-09T14:30:00.000Z'),
+      localDate: { year: 2026, month: 3, day: 9 },
+      resolution: 'exact',
+    });
+  });
+
+  it('applies the gap policy to a selected spring-forward weekday', () => {
+    expect(
+      nextRecurringOccurrence(
+        { hour: 2, minute: 30 },
+        [7],
+        new Date('2026-03-08T08:00:00.000Z'),
+        'America/Los_Angeles',
+      ),
+    ).toEqual({
+      instant: new Date('2026-03-08T10:00:00.000Z'),
+      localDate: { year: 2026, month: 3, day: 8 },
+      resolution: 'gap-adjusted',
+    });
+  });
+
+  it('does not fire twice during the repeated fall-back hour', () => {
+    expect(
+      nextRecurringOccurrence(
+        { hour: 1, minute: 30 },
+        [7],
+        new Date('2026-11-01T08:45:00.000Z'),
+        'America/Los_Angeles',
+      ).instant,
+    ).toEqual(new Date('2026-11-08T09:30:00.000Z'));
+  });
+
+  it('follows the same local time in the current zone after travel', () => {
+    const after = new Date('2026-06-15T10:00:00.000Z');
+    expect(
+      nextRecurringOccurrence(
+        { hour: 7, minute: 30 },
+        [1],
+        after,
+        'America/Los_Angeles',
+      ).instant,
+    ).toEqual(new Date('2026-06-15T14:30:00.000Z'));
+    expect(
+      nextRecurringOccurrence(
+        { hour: 7, minute: 30 },
+        [1],
+        after,
+        'America/New_York',
+      ).instant,
+    ).toEqual(new Date('2026-06-15T11:30:00.000Z'));
+  });
+
+  it('rejects an empty repeat selection and invalid comparison instant', () => {
+    expect(() =>
+      nextRecurringOccurrence({ hour: 7, minute: 30 }, [], new Date(), 'UTC'),
+    ).toThrow(/at least one weekday/);
+    expect(() =>
+      nextRecurringOccurrence(
+        { hour: 7, minute: 30 },
+        [1],
+        new Date('invalid'),
+        'UTC',
+      ),
+    ).toThrow(/valid date/);
   });
 });

@@ -10,10 +10,15 @@ export {
 } from './alarmForm';
 export type { AlarmFormValues } from './alarmForm';
 export {
+  nextRecurringOccurrence,
   recurringSchedulePolicy,
   resolveLocalDateTime,
 } from './schedulePolicy';
-export type { LocalDate, LocalDateTimeResolution } from './schedulePolicy';
+export type {
+  LocalDate,
+  LocalDateTimeResolution,
+  RecurringOccurrence,
+} from './schedulePolicy';
 export {
   AlarmRepositoryProvider,
   useAlarmRepository,
