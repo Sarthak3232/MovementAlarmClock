@@ -1,5 +1,30 @@
 # Implementation progress
 
+## 2026-10-01 — Timezone and daylight-saving policy
+
+### Scope
+
+- Defined recurring alarms as device-local wall-clock schedules whose weekdays are evaluated in the current IANA time zone.
+- Added a pure local-date/time resolver that chooses the first occurrence of a repeated fall-back minute and advances a nonexistent spring-forward time to the first valid minute after the gap.
+- Added next-occurrence calculation for selected weekdays, including recalculation in a new time zone after travel.
+- Documented the native reconciliation contract and the remaining ambiguity for one-time records, which do not yet persist a target date.
+
+### Evidence
+
+Local validation on Linux with Node 24.19.0:
+
+- Focused Jest coverage passed for ordinary local times, the 2026 Pacific spring-forward and fall-back transitions, weekday rollover across a DST boundary, repeated-hour suppression, invalid inputs, and a Pacific-to-Eastern time-zone change.
+- Full static, unit/component, dependency, and iOS JavaScript export results are recorded on the pull request for this change.
+
+The independent policy and deterministic-calculation portion of roadmap Day 11 is implemented. The milestone remains **in progress** because the AlarmKit adapter and launch/resume/significant-time-change reconciliation do not exist, and no lifecycle behavior has been exercised on an iPhone.
+
+### Boundaries and next run
+
+- These calculations return reference instants only; they do not schedule, cancel, enable, or deliver an alarm.
+- An empty repeat selection is still displayed as “Once,” but the current record has no target date. Such records must stay unscheduled until that contract is implemented rather than guessing from time alone.
+- No Xcode build, simulator launch, signing check, physical-iPhone test, AlarmKit trial, camera trial, or movement calibration ran in this environment.
+- If native access is still unavailable, the next independent work is roadmap Day 10 recovery/accessibility: model challenge permission/failure states and add an honest fallback UI without claiming live camera support.
+
 ## 2026-09-30 — Saved alarm CRUD UI
 
 ### Scope
