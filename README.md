@@ -2,7 +2,7 @@
 
 An iPhone alarm app with a movement challenge: get out of bed, stand in view of the camera, and complete **five jumping jacks** to finish your wake-up session.
 
-**Status:** The Expo/TypeScript foundation, a pure TypeScript jumping-jack counter, and a validated alarm model with versioned local-file persistence are in place. The alarm list/editor can create, reload, edit, and delete saved wake-up plans, but every record remains explicitly off and unscheduled. Recurring wall-clock behavior now has a deterministic [timezone and daylight-saving policy](docs/scheduling-policy.md), but it is not connected to native scheduling. Persistence has not been reloaded on an iPhone. The counter is covered by deterministic synthetic-pose tests, but it is not connected to a camera and its thresholds are not calibrated on a person or device. Native alarms and camera/pose integration are not implemented. The app does not ring alarms yet. See [implementation progress and validation evidence](docs/progress.md).
+**Status:** The Expo/TypeScript foundation, a pure TypeScript jumping-jack counter, and a validated alarm model with versioned local-file persistence are in place. The alarm list/editor can create, reload, edit, and delete saved wake-up plans, but every record remains explicitly off and unscheduled. Recurring wall-clock behavior now has a deterministic [timezone and daylight-saving policy](docs/scheduling-policy.md), but it is not connected to native scheduling. The challenge preview has accessible progress and explicit denied, unavailable, interrupted, retry, Settings, and non-camera fallback states, but no camera permission or live frames are connected. Persistence has not been reloaded on an iPhone. The counter is covered by deterministic synthetic-pose tests, but its thresholds are not calibrated on a person or device. Native alarms and camera/pose integration are not implemented. The app does not ring alarms yet. See [implementation progress and validation evidence](docs/progress.md).
 
 ## MVP
 
@@ -87,7 +87,7 @@ Keep system alarm status separate from challenge outcomes: `completed`, `abandon
 | `docs/`                   | Device findings and implementation decisions  |
 | `.github/workflows/`      | CI and build orchestration                    |
 
-`app/`, `src/components/`, `src/domain/movement/`, `src/features/alarms/`, `src/storage/`, `tests/`, `docs/`, and `.github/workflows/` now exist. Challenge-feature and native-module paths remain planned.
+`app/`, `src/components/`, `src/domain/movement/`, `src/features/alarms/`, `src/features/challenge/`, `src/storage/`, `tests/`, `docs/`, and `.github/workflows/` now exist. Native-module paths remain planned.
 
 ## Testing plan
 
