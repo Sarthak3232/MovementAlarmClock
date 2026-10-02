@@ -15,8 +15,10 @@ export default function SettingsScreen() {
         </Paragraph>
       </Card>
       <Paragraph>
-        Alarm permissions, camera permissions, and recovery options will appear
-        when those features are ready.
+        The challenge preview includes a non-camera fallback and is prepared to
+        show denied, failed, or interrupted camera states. Actual permission
+        requests and live-camera recovery remain unavailable until the on-device
+        adapter is connected.
       </Paragraph>
     </Screen>
   );

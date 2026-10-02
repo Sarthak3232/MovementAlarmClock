@@ -1,5 +1,31 @@
 # Implementation progress
 
+## 2026-10-02 — Challenge recovery and accessibility states
+
+### Scope
+
+- Added an explicit camera-access state model for not connected, requesting, ready, permission denied, unavailable, and interrupted conditions.
+- Kept movement processing gated to ready camera state in movement mode. Selecting the fallback blocks pose processing and never represents five completed reps.
+- Replaced the static challenge card with accessible progress semantics, announced status text, safe framing guidance, permission Settings/retry actions, and a reversible non-camera fallback preview.
+- Added component coverage for permission denial, camera failure, interruption, injected progress, fallback boundaries, and direct challenge navigation.
+
+### Evidence
+
+Local validation on Linux with Node 24.19.0:
+
+- Focused state and component tests passed for all modeled recovery paths.
+- Full static, unit/component, dependency, and iOS JavaScript export results are recorded on the pull request for this change.
+
+The independent state-model, recovery-copy, and accessibility portion of roadmap Day 10 is implemented. The milestone remains **in progress** because no camera adapter requests permission, produces frames, reports interruptions, or verifies recovery on an iPhone.
+
+### Boundaries and next run
+
+- The default screen remains `not-connected`; denied, unavailable, interrupted, and ready states are dependency-injection seams for the future on-device adapter, not claims of observed camera behavior.
+- Choosing the fallback in this preview does not persist a session outcome, stop an iPhone system alarm, or mark movement complete.
+- No raw image or camera frame is read, stored, or uploaded.
+- No Xcode build, simulator launch, signing check, physical-iPhone test, AlarmKit trial, camera trial, or movement calibration ran in this environment.
+- If native access is still unavailable, the next independent work is roadmap Day 9's wake-up-session lifecycle model: idempotent occurrence handling and separate system-dismissal, movement-completion, and fallback outcomes.
+
 ## 2026-10-01 — Timezone and daylight-saving policy
 
 ### Scope
