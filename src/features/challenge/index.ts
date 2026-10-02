@@ -11,3 +11,4 @@ export type {
   ChallengeAccessState,
   ChallengeRecoveryOptions,
 } from './accessState';
+export { ChallengeExperience } from './ChallengeExperience';
