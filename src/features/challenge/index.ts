@@ -27,3 +27,11 @@ export type {
   WakeUpSessionEvent,
   WakeUpSessionUpdate,
 } from './session';
+export {
+  applyEventToOccurrence,
+  openWakeUpOccurrence,
+} from './sessionRegistry';
+export type {
+  ApplyOccurrenceEventResult,
+  OpenOccurrenceResult,
+} from './sessionRegistry';
