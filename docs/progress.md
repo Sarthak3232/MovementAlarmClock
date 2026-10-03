@@ -1,5 +1,32 @@
 # Implementation progress
 
+## 2026-10-03 — Wake-up session lifecycle
+
+### Scope
+
+- Added a typed wake-up session model with independent challenge and system-alarm state.
+- Added monotonic rep progress plus terminal `completed`, `fallback`, and `abandoned` challenge outcomes.
+- Made movement completion emit a system-stop request effect without claiming the alarm stopped; only a separate confirmation records the system stop and its source.
+- Added a pure occurrence registry that reuses one session for replayed callbacks, rejects identity collisions, and updates only the matching occurrence.
+- Documented the lifecycle contract and remaining persistence/native adapter work.
+
+### Evidence
+
+Local validation on Linux with Node 24.19.0:
+
+- Focused Jest coverage passed for duplicate occurrence delivery, distinct repeating occurrences, ID collisions, stale/duplicate progress, movement completion, stop requests, confirmed system dismissal, fallback, abandonment, and invalid input.
+- Full static, unit/component, dependency, and iOS JavaScript export results are recorded on the pull request for this change.
+
+The independent state-machine and callback-idempotency portion of roadmap Day 9 is implemented. The milestone remains **in progress** because sessions are not persisted, no AlarmKit occurrence opens the app, and no end-to-end native flow has been observed.
+
+### Boundaries and next run
+
+- The occurrence registry is a pure collection operation. Callers must persist its returned records before it can survive app termination.
+- A `request-system-alarm-stop` effect is intent, not evidence of a successful stop. The system remains `ringing` until a distinct confirmation event arrives.
+- System dismissal never increments reps or changes the challenge outcome. A completed, abandoned, or fallback challenge never overwrites a different terminal outcome.
+- No Xcode build, simulator launch, signing check, physical-iPhone test, AlarmKit trial, camera trial, raw-frame processing, or movement calibration ran in this environment.
+- If native access is still unavailable, the next independent work is a versioned wake-up-session repository so occurrence deduplication and outcomes survive reload.
+
 ## 2026-10-02 — Challenge recovery and accessibility states
 
 ### Scope
