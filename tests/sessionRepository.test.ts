@@ -1,6 +1,7 @@
 import type {
   CreateWakeUpSessionInput,
   WakeUpSession,
+  WakeUpSessionEvent,
 } from '../src/features/challenge';
 import {
   SessionStorageError,
@@ -134,6 +135,22 @@ describe('wake-up session repository', () => {
     });
     expect(duplicate.disposition).toBe('duplicate');
     expect(store.writes).toBe(writesAfterProgress);
+  });
+
+  it('rejects invalid callback payloads before writing them', async () => {
+    const store = new MemorySessionStore();
+    const repository = new WakeUpSessionRepository(store);
+    await repository.openOccurrence(occurrence());
+    const writesBeforeInvalidEvent = store.writes;
+
+    await expect(
+      repository.applyEvent('occurrence-1', {
+        type: 'fallback-used',
+        reason: 'network-error',
+        at: '2026-10-04T14:01:00.000Z',
+      } as unknown as WakeUpSessionEvent),
+    ).rejects.toThrow(/supported reason/);
+    expect(store.writes).toBe(writesBeforeInvalidEvent);
   });
 
   it('rejects corrupt data without overwriting it', async () => {

@@ -164,9 +164,10 @@ export class WakeUpSessionRepository {
   }
 
   private async writeSessions(sessions: WakeUpSession[]): Promise<void> {
+    const validatedSessions = sessions.map(parseWakeUpSession);
     const envelope: SessionEnvelope = {
       version: sessionStorageSchemaVersion,
-      sessions: orderSessions(sessions),
+      sessions: orderSessions(validatedSessions),
     };
     await this.store.write(JSON.stringify(envelope));
   }

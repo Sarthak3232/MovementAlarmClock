@@ -42,6 +42,15 @@ describe('persisted wake-up session validation', () => {
     expect(() =>
       parseWakeUpSession({ ...activeSession(), repCount: 6 }),
     ).toThrow(/repCount/);
+    expect(() =>
+      createWakeUpSession({
+        id: 'session-1',
+        alarmId: 'alarm-1',
+        occurrenceId: 'occurrence-1',
+        startedAt: '2026-10-04T14:00:00.000Z',
+        systemAlarmStatus: 'stopped',
+      } as unknown as Parameters<typeof createWakeUpSession>[0]),
+    ).toThrow(/systemAlarmStatus/);
   });
 
   it('requires challenge terminal metadata and rep invariants', () => {

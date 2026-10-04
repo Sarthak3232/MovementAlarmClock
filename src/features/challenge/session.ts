@@ -304,6 +304,11 @@ export function createWakeUpSession(
   }
   const startedAt = canonicalTimestamp(input.startedAt, 'startedAt');
   const systemAlarmStatus = input.systemAlarmStatus ?? 'unknown';
+  if (systemAlarmStatus !== 'unknown' && systemAlarmStatus !== 'ringing') {
+    throw new RangeError(
+      'systemAlarmStatus must be either unknown or ringing.',
+    );
+  }
 
   return {
     id: nonEmpty(input.id, 'id'),
@@ -381,6 +386,9 @@ export function applyWakeUpSessionEvent(
     }
 
     case 'fallback-used': {
+      if (!fallbackReasons.includes(event.reason)) {
+        throw new RangeError('fallback-used requires a supported reason.');
+      }
       if (session.challenge.status === 'fallback') {
         return unchanged(session, 'duplicate');
       }
@@ -425,6 +433,14 @@ export function applyWakeUpSessionEvent(
     }
 
     case 'system-alarm-stopped': {
+      if (
+        event.source !== 'system-control' &&
+        event.source !== 'challenge-request'
+      ) {
+        throw new RangeError(
+          'system-alarm-stopped requires a supported stop source.',
+        );
+      }
       if (session.systemAlarm.status === 'stopped') {
         return unchanged(session, 'duplicate');
       }
