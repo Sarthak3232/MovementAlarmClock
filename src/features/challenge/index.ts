@@ -16,6 +16,8 @@ export {
   applyWakeUpSessionEvent,
   createWakeUpSession,
   defaultMovementTarget,
+  parseWakeUpSession,
+  WakeUpSessionValidationError,
 } from './session';
 export type {
   ChallengeOutcome,
