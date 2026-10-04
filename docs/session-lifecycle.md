@@ -1,12 +1,20 @@
 # Wake-up session lifecycle
 
-The wake-up session model keeps the movement challenge and the iPhone system alarm as independent state dimensions. It is a pure TypeScript contract for future persistence and native callbacks; it does not open, stop, or observe an AlarmKit alarm.
+The wake-up session model keeps the movement challenge and the iPhone system alarm as independent state dimensions. A versioned repository persists that pure TypeScript contract, but neither layer opens, stops, or observes an AlarmKit alarm.
 
 ## Identity and duplicate callbacks
 
 Each native alarm delivery must provide a stable occurrence ID. Opening the same occurrence more than once returns the original session, even if a callback is replayed after app launch or supplies a newly generated session ID. Different occurrences of the same repeating alarm create different sessions.
 
 An occurrence ID cannot be shared across alarms, and a session ID cannot be reused for another occurrence. Collections with duplicate session or occurrence IDs are rejected instead of guessed or silently repaired.
+
+## Persistence contract
+
+The wake-up session repository stores a versioned JSON envelope in a dedicated app-document file. Repository recreation reloads the same occurrence identity and outcome, so replaying a callback after a JavaScript or app restart returns the original session. Mutations are serialized to prevent concurrent callbacks from losing a session or event.
+
+Every loaded session is runtime validated, including canonical timestamps, rep bounds, terminal challenge metadata, and independent system-stop metadata. Malformed JSON, unsupported schema versions, invalid state combinations, and duplicate session or occurrence IDs fail without rewriting the source data. Duplicate or ignored events also avoid an unnecessary write.
+
+This contract has only been exercised through the store boundary in automated tests. The app does not yet construct the repository from a native callback, and file survival has not been observed after terminating and reopening an iPhone build.
 
 ## Independent state
 
@@ -24,7 +32,6 @@ Challenge outcomes are terminal and mutually exclusive. Replayed terminal events
 
 ## Remaining integration work
 
-- Persist session records and occurrence identity through a versioned repository.
 - Map real AlarmKit delivery and stop callbacks to stable occurrence IDs and confirmed system state.
 - Map the jumping-jack counter's completion event to `movement-completed` exactly once.
 - Connect the challenge fallback UI to a persisted fallback outcome.

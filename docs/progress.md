@@ -1,5 +1,31 @@
 # Implementation progress
 
+## 2026-10-04 — Versioned wake-up session persistence
+
+### Scope
+
+- Added strict runtime validation for loaded wake-up sessions, including identity, canonical timestamps, rep bounds, terminal challenge metadata, and independent system-alarm stop metadata.
+- Added a version-1 wake-up session repository and dedicated Expo FileSystem store.
+- Serialized occurrence creation and event mutations so concurrent callbacks cannot lose records.
+- Preserved occurrence deduplication and challenge/system-alarm outcomes across repository recreation while avoiding writes for replayed occurrences and duplicate or ignored events.
+- Rejected malformed JSON, unsupported versions, invalid session states, and duplicate session or occurrence IDs without overwriting the stored value.
+
+### Evidence
+
+Local validation on Linux with Node 24.19.0:
+
+- Focused Jest coverage passed for valid/invalid session decoding, repository recreation, replayed callbacks, concurrent occurrence creation, movement completion, later confirmed alarm stop, duplicate-event writes, corrupt storage, unknown schemas, and the Expo file boundary.
+- Full static, unit/component, dependency, and iOS JavaScript export results are recorded on the pull request for this change.
+
+The persistence and callback-idempotency portion of roadmap Day 9 now works behind a typed repository boundary. The milestone remains **in progress** because neither the app nor an AlarmKit adapter opens persisted occurrences, and no end-to-end native flow has been observed.
+
+### Boundaries and next run
+
+- Movement completion returns a `request-system-alarm-stop` effect while persisting a completed challenge whose system alarm remains `ringing`; only a later confirmed stop event persists `stopped`.
+- The repository uses a separate session file and is not yet instantiated by the current app routes. Automated repository recreation is not evidence of an iPhone app-termination/relaunch result.
+- No Xcode build, simulator launch, signing check, physical-iPhone test, AlarmKit callback, native alarm stop, camera trial, raw-frame processing, or movement calibration ran in this environment.
+- If native access is still unavailable, the next independent work is to connect challenge recovery and counter events to a persisted session controller through dependency-injected boundaries, without claiming live camera or AlarmKit support.
+
 ## 2026-10-03 — Wake-up session lifecycle
 
 ### Scope
