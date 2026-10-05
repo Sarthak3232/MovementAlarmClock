@@ -1,5 +1,32 @@
 # Implementation progress
 
+## 2026-10-05 — Persisted challenge session controller
+
+### Scope
+
+- Added a dependency-injected controller that opens or reloads one persisted session for an alarm occurrence.
+- Gated pose processing on both an active challenge and an explicitly ready camera state.
+- Serialized rapid frame callbacks through the jumping-jack counter and persisted rep progress or five-rep completion through the session repository.
+- Connected fallback, abandonment, and confirmed system-stop inputs to their distinct persisted events.
+- Restored completed movement and fallback access state after repository recreation without storing raw frames or pose landmarks.
+
+### Evidence
+
+Local validation on Linux with Node 24.19.0:
+
+- Focused Jest coverage passed for blocked frames, concurrently delivered synthetic frames, five-rep completion, reload, fallback, terminal frame rejection, and a separately confirmed system stop.
+- Full static, unit/component, dependency, and iOS JavaScript export results are recorded on the pull request for this change.
+
+The independent controller portion of roadmap Days 8–10 is implemented behind injected boundaries. Those milestones remain **in progress** because the current route is still an explicit preview, no camera adapter supplies live on-device landmarks, no AlarmKit occurrence opens the controller, and no end-to-end native flow has been observed.
+
+### Boundaries and next run
+
+- Pose frames are accepted only from an injected ready adapter and are reduced in memory. Persistence receives rep counts and lifecycle events, never landmarks, raw images, or video.
+- Five reps return `request-system-alarm-stop`; this is still intent, not evidence. Only `confirmSystemAlarmStopped` persists a distinct native confirmation.
+- The controller has no production singleton or route wiring yet, so automated repository recreation is not evidence of an iPhone app-termination/relaunch result.
+- No Xcode build, simulator launch, signing check, physical-iPhone test, AlarmKit callback, native alarm stop, camera permission, raw-frame processing, or movement calibration ran in this environment.
+- If native access is still unavailable, the next independent work is a validated challenge-route entry contract that distinguishes the static preview from an active persisted occurrence and exposes safe loading/error states.
+
 ## 2026-10-04 — Versioned wake-up session persistence
 
 ### Scope
