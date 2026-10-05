@@ -16,6 +16,14 @@ Every loaded session is runtime validated, including canonical timestamps, rep b
 
 This contract has only been exercised through the store boundary in automated tests. The app does not yet construct the repository from a native callback, and file survival has not been observed after terminating and reopening an iPhone build.
 
+## Controller boundary
+
+The challenge session controller accepts a repository, canonical wall-clock function, camera availability updates, and normalized pose frames through dependency-injected boundaries. Frames are processed only while the session is active and the injected camera state is `ready`. Raw frames and pose landmarks are never passed to persistence; only rep progress and terminal session events are stored.
+
+Frame operations are serialized before they reach the movement state machine, so rapid callbacks cannot race the rep count. Repository failure leaves the prior movement state intact for an explicit retry. Reopening a persisted completed session restores a completed movement state, while fallback sessions restore fallback access and reject later pose processing.
+
+Five reps persist movement completion and return `request-system-alarm-stop` to the future native adapter. The controller does not execute or confirm that request. Only a separately injected `system-alarm-stopped` callback records a stopped alarm, preserving the platform boundary.
+
 ## Independent state
 
 | Event                | Challenge effect                                  | System-alarm effect                               |
@@ -33,7 +41,7 @@ Challenge outcomes are terminal and mutually exclusive. Replayed terminal events
 ## Remaining integration work
 
 - Map real AlarmKit delivery and stop callbacks to stable occurrence IDs and confirmed system state.
-- Map the jumping-jack counter's completion event to `movement-completed` exactly once.
-- Connect the challenge fallback UI to a persisted fallback outcome.
+- Instantiate the controller from a validated active-occurrence route instead of the current static preview.
+- Connect the challenge UI to controller snapshots and persist its fallback selection.
 - Reconcile unfinished sessions after launch, termination, duplicate callbacks, or native state changes.
 - Verify every transition on a signed iPhone build while locked, backgrounded, and terminated.
