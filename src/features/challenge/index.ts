@@ -37,3 +37,10 @@ export type {
   ApplyOccurrenceEventResult,
   OpenOccurrenceResult,
 } from './sessionRegistry';
+export { ChallengeSessionController } from './sessionController';
+export type {
+  ChallengeFrameResult,
+  ChallengeSessionControllerDependencies,
+  ChallengeSessionSnapshot,
+  WakeUpSessionRepositoryPort,
+} from './sessionController';
