@@ -24,6 +24,12 @@ Frame operations are serialized before they reach the movement state machine, so
 
 Five reps persist movement completion and return `request-system-alarm-stop` to the future native adapter. The controller does not execute or confirm that request. Only a separately injected `system-alarm-stopped` callback records a stopped alarm, preserving the platform boundary.
 
+## Route entry contract
+
+The `/challenge` route without an occurrence ID is always a static preview. Supplying one validated occurrence ID performs a read-only lookup of an existing persisted session; route input alone cannot open or create a wake-up session. Empty, repeated, excessively long, and control-character IDs are rejected before storage access.
+
+An occurrence link renders explicit loading, missing, and storage-error states. Existing active sessions display persisted progress without exposing the preview-only fallback control, because that control is not connected to the persisted controller yet. Completed, fallback, and abandoned sessions render distinct summaries, and movement completion continues to show an unconfirmed system stop until a separate stop event exists.
+
 ## Independent state
 
 | Event                | Challenge effect                                  | System-alarm effect                               |
@@ -41,7 +47,7 @@ Challenge outcomes are terminal and mutually exclusive. Replayed terminal events
 ## Remaining integration work
 
 - Map real AlarmKit delivery and stop callbacks to stable occurrence IDs and confirmed system state.
-- Instantiate the controller from a validated active-occurrence route instead of the current static preview.
+- Instantiate the controller after the read-only route loads a validated active occurrence.
 - Connect the challenge UI to controller snapshots and persist its fallback selection.
 - Reconcile unfinished sessions after launch, termination, duplicate callbacks, or native state changes.
 - Verify every transition on a signed iPhone build while locked, backgrounded, and terminated.

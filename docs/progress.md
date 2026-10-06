@@ -1,5 +1,33 @@
 # Implementation progress
 
+## 2026-10-06 — Validated challenge route entry
+
+### Scope
+
+- Kept `/challenge` without parameters as an explicit static preview.
+- Added runtime validation for a single occurrence ID, rejecting empty, repeated, excessively long, and control-character values before storage access.
+- Added a session repository provider and read-only lookup for existing persisted occurrences; missing or invalid links never create a session.
+- Added accessible loading, invalid-link, not-found, storage-failure, active-progress, completed, fallback, and abandoned route states.
+- Hid the preview-only fallback control from active persisted sessions until that action is wired through the controller.
+- Kept saved movement completion visibly separate from an unconfirmed system-alarm stop.
+
+### Evidence
+
+Local validation on Linux with Node 24.19.0:
+
+- Focused Jest coverage passed for route parsing, preview isolation, no-read invalid links, missing records, storage failures, active progress, unconfirmed alarm stop, and terminal fallback/completion summaries.
+- Existing preview recovery and Expo Router navigation tests remained green.
+- Full static, unit/component, dependency, and iOS JavaScript export results are recorded on the pull request for this change.
+
+The independent route-entry portion of roadmap Day 9 is implemented. The milestone remains **in progress** because AlarmKit does not create or open these links, the active route is read-only, and no native alarm-to-challenge flow has been observed.
+
+### Boundaries and next run
+
+- URL parameters are lookup keys, not proof that iOS delivered an alarm. The route cannot create a wake-up session or change an outcome.
+- Active routes load only persisted rep and lifecycle state. Camera status remains `not-connected`, live frames are unavailable, and preview-only fallback is suppressed rather than falsely persisted.
+- No Xcode build, simulator launch, signing check, physical-iPhone test, AlarmKit link/callback, native alarm stop, camera permission, raw-frame processing, or movement calibration ran in this environment.
+- If native access is still unavailable, the next independent work is to bind an already-loaded active route to the persisted controller so recovery actions update the session while camera and alarm adapters remain explicit unavailable dependencies.
+
 ## 2026-10-05 — Persisted challenge session controller
 
 ### Scope
