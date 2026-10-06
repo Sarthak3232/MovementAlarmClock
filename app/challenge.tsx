@@ -1,17 +1,23 @@
+import { useLocalSearchParams } from 'expo-router';
 import { Linking } from 'react-native';
-import { Paragraph, Screen } from '../src/components/Screen';
-import { ChallengeExperience } from '../src/features/challenge';
+import {
+  ChallengeRouteScreen,
+  parseChallengeRouteEntry,
+} from '../src/features/challenge';
+import { useWakeUpSessionRepository } from '../src/features/challenge/WakeUpSessionRepositoryProvider';
 
 export default function ChallengeScreen() {
+  const params = useLocalSearchParams();
+  const repository = useWakeUpSessionRepository();
+  const entry = parseChallengeRouteEntry({
+    occurrenceId: params.occurrenceId,
+  });
+
   return (
-    <Screen title="Five to feel awake.">
-      <Paragraph>
-        Challenge preview — camera and movement detection are not connected.
-      </Paragraph>
-      <ChallengeExperience
-        cameraAvailability="not-connected"
-        onOpenSettings={() => void Linking.openSettings()}
-      />
-    </Screen>
+    <ChallengeRouteScreen
+      entry={entry}
+      repository={repository}
+      onOpenSettings={() => void Linking.openSettings()}
+    />
   );
 }

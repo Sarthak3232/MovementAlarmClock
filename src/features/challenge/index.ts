@@ -12,6 +12,7 @@ export type {
   ChallengeRecoveryOptions,
 } from './accessState';
 export { ChallengeExperience } from './ChallengeExperience';
+export { ChallengeRouteScreen } from './ChallengeRouteScreen';
 export {
   applyWakeUpSessionEvent,
   createWakeUpSession,
@@ -44,3 +45,5 @@ export type {
   ChallengeSessionSnapshot,
   WakeUpSessionRepositoryPort,
 } from './sessionController';
+export { parseChallengeRouteEntry } from './routeEntry';
+export type { ChallengeRouteEntry, ChallengeRouteParams } from './routeEntry';
