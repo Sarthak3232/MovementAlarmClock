@@ -13,6 +13,8 @@ type ChallengeExperienceProps = {
   cameraAvailability: CameraAvailability;
   currentReps?: number;
   targetReps?: number;
+  preview?: boolean;
+  showFallbackPreview?: boolean;
   onOpenSettings?: () => void;
   onRetryCamera?: () => void;
 };
@@ -56,6 +58,8 @@ export function ChallengeExperience({
   cameraAvailability,
   currentReps = 0,
   targetReps = 5,
+  preview = true,
+  showFallbackPreview = true,
   onOpenSettings,
   onRetryCamera,
 }: ChallengeExperienceProps) {
@@ -110,7 +114,7 @@ export function ChallengeExperience({
       <Card>
         <Text
           accessibilityRole="progressbar"
-          accessibilityLabel={`${currentReps} of ${targetReps} jumping jacks. Preview only.`}
+          accessibilityLabel={`${currentReps} of ${targetReps} jumping jacks.${preview ? ' Preview only.' : ''}`}
           accessibilityValue={{
             min: 0,
             max: targetReps,
@@ -144,7 +148,7 @@ export function ChallengeExperience({
         {recovery.canRetryCamera ? (
           <Button title="Retry camera" onPress={retryCamera} />
         ) : null}
-        {recovery.canUseFallback ? (
+        {recovery.canUseFallback && showFallbackPreview ? (
           <Button
             title="Use non-camera fallback"
             onPress={() => dispatch({ type: 'use-fallback' })}
