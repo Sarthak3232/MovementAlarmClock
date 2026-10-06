@@ -44,3 +44,5 @@ export type {
   ChallengeSessionSnapshot,
   WakeUpSessionRepositoryPort,
 } from './sessionController';
+export { parseChallengeRouteEntry } from './routeEntry';
+export type { ChallengeRouteEntry, ChallengeRouteParams } from './routeEntry';
